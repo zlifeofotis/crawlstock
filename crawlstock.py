@@ -3,7 +3,8 @@
 #Copyright (C) Mr.D
 
 import re
-import urllib
+import urllib.request
+import urllib.error
 import chardet
 import time
 import sys

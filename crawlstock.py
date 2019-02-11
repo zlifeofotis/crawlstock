@@ -74,9 +74,10 @@ class CrawlStock:
     def ins_data_mongo(self, url = "https://gupiao.baidu.com/stock/", numRetries = 3):
         my_set1 = self.db[self.code_set]
         my_set2 = self.db[self.data_set]
-        for i in my_set1.find({},{"_id":0}):
+        datas = my_set1.find({},{"_id":0},no_cursor_timeout = True)
+        for i in datas:
             num_retries = numRetries
-            print(i['id'])
+            #print(i['id'])
             my_url = url + i['id'] + ".html"
             #time.sleep(30)
             self.download(my_url, numRetries, 2)
@@ -91,12 +92,20 @@ class CrawlStock:
                     self.get_datas()
                 else:
                     self.data_list = []
-            print(self.data_list)
+            print([i['id']] + self.data_list)
             if self.data_list:
                 my_dict = {'id':i['id'],'日期':self.data_list[0][0],'收盘价':self.data_list[0][1],'开盘价':self.data_list[0][3],'昨收盘价':self.data_list[0][8],'涨跌率':self.data_list[0][2],'最高价':self.data_list[0][5],'最低价':self.data_list[0][9],'成交量':self.data_list[0][4],'每股收益':self.data_list[0][6],'总股本':self.data_list[0][7]}
                 my_set2.insert_one(my_dict)  
+        datas.close()
+    def test(self):
+        my_set1 = self.db[self.code_set]
+        my_set2 = self.db[self.data_set]
+        for i in my_set1.find({},{"_id":0}):
+            print(i['id'] , i['name'])
                 
 if __name__ == '__main__':
     stock = CrawlStock()
     stock.conn_mongo()
     stock.ins_data_mongo()
+    #stock.test()
+
